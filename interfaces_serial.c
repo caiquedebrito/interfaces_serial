@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/timer.h"
 
 #define BUTTON_A 5
 #define BUTTON_B 6
