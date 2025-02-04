@@ -4,8 +4,8 @@
 
 #define BUTTON_A 5
 #define BUTTON_B 6
-#define BLUE_LED_PIN 11
-#define GREEN_LED_PIN 12
+#define GREEN_LED_PIN 11
+#define BLUE_LED_PIN 12
 #define DEBOUNCE_TIME 500
 
 bool blue_led_on = false;
@@ -13,6 +13,8 @@ bool green_led_on = false;
 
 void turn_on_led(bool g, bool b);
 static void irq_handler(uint gpio, uint32_t events);
+void toggle_blue_led();
+void toggle_green_led();
 
 int main()
 {
@@ -43,7 +45,6 @@ int main()
     gpio_set_irq_enabled_with_callback(BUTTON_B, GPIO_IRQ_EDGE_FALL, true, &irq_handler);
 
     while (true) {
-        printf("Hello, world!\n");
         sleep_ms(1000);
     }
 }
@@ -54,35 +55,52 @@ void turn_on_led(bool g, bool b) {
 }
 
 static void irq_handler(uint gpio, uint32_t events) {
-    static volatile uint32_t last_time = 0; // Tempo da última pressão
-    volatile uint32_t current_time = to_ms_since_boot(get_absolute_time()); // Tempo atual
-
-    // Verifica se o botão foi pressionado muito rápido
-    if (current_time - last_time < DEBOUNCE_TIME) return;
-
-    last_time = current_time; // Atualiza o tempo da última pressão
+    static volatile uint32_t last_time_a = 0; // Tempo da última pressão do botão A
+    volatile uint32_t current_time_a = to_ms_since_boot(get_absolute_time()); // Tempo atual da pressão do botão A
+    static volatile uint32_t last_time_b = 0; // Tempo da última pressão do botão B
+    volatile uint32_t current_time_b = to_ms_since_boot(get_absolute_time()); // Tempo atual da pressão do botão B
 
     // Verifica se o botão pressionado foi o A
     if (gpio == BUTTON_A) {
-        if (blue_led_on) { // Se o LED azul estiver ligado, desliga
-            blue_led_on = false;
-            turn_on_led(false, false);
-            return;
-        }
-        // Se o LED azul estiver desligado, liga
-        blue_led_on = true;
-        turn_on_led(false, true);
-        return;
-    } 
-    
-    // Verifica se o botão pressionado foi o B
-    if (green_led_on) { // Se o LED verde estiver ligado, desliga
-        green_led_on = false;
-        turn_on_led(false, false);
+        if (current_time_a - last_time_a < DEBOUNCE_TIME) return;
+        last_time_a = current_time_a;
+        toggle_green_led();
         return;
     }
 
+    // Se chegou aqui, o botão pressionado foi o B
+
+    if (current_time_b - last_time_b < DEBOUNCE_TIME) return;
+    last_time_b = current_time_b;
+    toggle_blue_led();
+}
+
+void toggle_green_led() {
+    if (green_led_on) { // Se o LED verde estiver ligado, desliga
+        green_led_on = false;
+        turn_on_led(false, false);
+        blue_led_on = false;
+        return;
+    }
     // Se o LED verde estiver desligado, liga
     green_led_on = true;
     turn_on_led(true, false);
+    if (blue_led_on) {
+        blue_led_on = false;
+    }
+}
+
+void toggle_blue_led() {
+    if (blue_led_on) { // Se o LED azul estiver ligado, desliga
+        blue_led_on = false;
+        turn_on_led(false, false);
+        green_led_on = false;
+        return;
+    }
+    // Se o LED azul estiver desligado, liga
+    blue_led_on = true;
+    turn_on_led(false, true);
+    if (green_led_on) {
+        green_led_on = false;
+    }
 }
