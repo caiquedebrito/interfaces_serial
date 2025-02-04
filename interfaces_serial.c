@@ -6,6 +6,9 @@
 #define BLUE_LED_PIN 11
 #define GREEN_LED_PIN 12
 
+bool blue_led_on = false;
+bool green_led_on = false;
+
 void turn_on_led(bool g, bool b);
 static void irq_handler(uint gpio, uint32_t events);
 
@@ -49,9 +52,27 @@ void turn_on_led(bool g, bool b) {
 }
 
 static void irq_handler(uint gpio, uint32_t events) {
+    // Verifica se o botão pressionado foi o A
     if (gpio == BUTTON_A) {
+        if (blue_led_on) { // Se o LED azul estiver ligado, desliga
+            blue_led_on = false;
+            turn_on_led(false, false);
+            return;
+        }
+        // Se o LED azul estiver desligado, liga
+        blue_led_on = true;
         turn_on_led(true, false);
-    } else if (gpio == BUTTON_B) {
-        turn_on_led(false, true);
+        return;
+    } 
+    
+    // Verifica se o botão pressionado foi o B
+    if (green_led_on) { // Se o LED verde estiver ligado, desliga
+        green_led_on = false;
+        turn_on_led(false, false);
+        return;
     }
+
+    // Se o LED verde estiver desligado, liga
+    green_led_on = true;
+    turn_on_led(true, false);
 }
