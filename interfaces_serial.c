@@ -6,6 +6,7 @@
 #define BUTTON_B 6
 #define BLUE_LED_PIN 11
 #define GREEN_LED_PIN 12
+#define DEBOUNCE_TIME 500
 
 bool blue_led_on = false;
 bool green_led_on = false;
@@ -53,6 +54,14 @@ void turn_on_led(bool g, bool b) {
 }
 
 static void irq_handler(uint gpio, uint32_t events) {
+    static volatile uint32_t last_time = 0; // Tempo da última pressão
+    volatile uint32_t current_time = to_ms_since_boot(get_absolute_time()); // Tempo atual
+
+    // Verifica se o botão foi pressionado muito rápido
+    if (current_time - last_time < DEBOUNCE_TIME) return;
+
+    last_time = current_time; // Atualiza o tempo da última pressão
+
     // Verifica se o botão pressionado foi o A
     if (gpio == BUTTON_A) {
         if (blue_led_on) { // Se o LED azul estiver ligado, desliga
