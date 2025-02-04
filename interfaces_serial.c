@@ -71,7 +71,7 @@ static void irq_handler(uint gpio, uint32_t events) {
         }
         // Se o LED azul estiver desligado, liga
         blue_led_on = true;
-        turn_on_led(true, false);
+        turn_on_led(false, true);
         return;
     } 
     
