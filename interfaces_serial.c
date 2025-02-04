@@ -3,10 +3,20 @@
 
 #define BUTTON_A 5
 #define BUTTON_B 6
+#define BLUE_LED_PIN 11
+#define GREEN_LED_PIN 12
 
 int main()
 {
     stdio_init_all();
+
+    // Configuração do pino de LED azul
+    gpio_init(BLUE_LED_PIN);
+    gpio_set_dir(BLUE_LED_PIN, GPIO_OUT);
+
+    // Configuração do pino de LED verde
+    gpio_init(GREEN_LED_PIN);
+    gpio_set_dir(GREEN_LED_PIN, GPIO_OUT);
 
     // Configuração do pino de botão A
     gpio_init(BUTTON_A);
