@@ -6,6 +6,7 @@
 #define BLUE_LED_PIN 11
 #define GREEN_LED_PIN 12
 
+void turn_on_led(bool g, bool b);
 static void irq_handler(uint gpio, uint32_t events);
 
 int main()
@@ -42,6 +43,15 @@ int main()
     }
 }
 
-static void irq_handler(uint gpio, uint32_t events) {
+void turn_on_led(bool g, bool b) {
+    gpio_put(GREEN_LED_PIN, g);
+    gpio_put(BLUE_LED_PIN, b);
+}
 
+static void irq_handler(uint gpio, uint32_t events) {
+    if (gpio == BUTTON_A) {
+        turn_on_led(true, false);
+    } else if (gpio == BUTTON_B) {
+        turn_on_led(false, true);
+    }
 }
