@@ -4,6 +4,9 @@
 #include "ws2812.pio.h"
 #include "hardware/pio.h"
 #include "digits.h"
+#include "hardware/i2c.h"
+#include "inc/ssd1306.h"
+#include "inc/font.h"
 
 #define BUTTON_A 5
 #define BUTTON_B 6
@@ -13,6 +16,13 @@
 
 #define IS_RGBW false
 #define WS2812_PIN 7
+
+#define I2C_PORT i2c1
+#define I2C_ADDR 0x3C
+#define I2C_SDA 14
+#define I2C_SCL 15
+
+ssd1306_t ssd;
 
 // #define UART_ID uart0
 // #define BAUD_RATE 115200
@@ -46,6 +56,19 @@ int main()
     //  // Configura os pinos GPIO para a UART
     //  gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART); // Configura o pino 0 para TX
     //  gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART); // Configura o pino 1 para RX
+
+    // Inicialização do I2C em 400 kHz
+    i2c_init(I2C_PORT, 400 * 1000);
+
+    // Configuração dos pinos SDA e SCL
+    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C_SDA);
+    gpio_pull_up(I2C_SCL);
+    ssd1306_init(&ssd, WIDTH, HEIGHT, false, I2C_ADDR, I2C_PORT);
+    ssd1306_config(&ssd);
+    ssd1306_fill(&ssd, false);
+    ssd1306_send_data(&ssd);
 
     // Configuração do pino de LED azul
     gpio_init(BLUE_LED_PIN);
@@ -93,9 +116,15 @@ int main()
                     continue;
                 }
 
-                if (c < '0' || c > '9') {
-                    continue;
-                }
+                if (
+                    (c < '0') && (c > '9' && c < 'A')
+                    && (c > 'Z' && c < 'a')
+                    && (c > 'z')
+                ) continue;
+
+                ssd1306_fill(&ssd, false);
+                ssd1306_draw_char(&ssd, c, 64, 32);
+                ssd1306_send_data(&ssd);
 
                 switch (c) {
                     case '0':
@@ -168,13 +197,22 @@ static void irq_handler(uint gpio, uint32_t events) {
 }
 
 void toggle_green_led() {
+    ssd1306_fill(&ssd, false);
     if (green_led_on) { // Se o LED verde estiver ligado, desliga
+        printf("Desligando LED verde\n");
+        ssd1306_draw_string(&ssd, "LED verde", 27, 32);
+        ssd1306_draw_string(&ssd, "desligado", 27, 42);
+        ssd1306_send_data(&ssd);
         green_led_on = false;
         turn_on_led(false, false);
         blue_led_on = false;
         return;
     }
     // Se o LED verde estiver desligado, liga
+    printf("Ligando LED verde\n");
+    ssd1306_draw_string(&ssd, "LED verde", 27, 32);
+    ssd1306_draw_string(&ssd, "ligado", 25, 42);
+    ssd1306_send_data(&ssd);
     green_led_on = true;
     turn_on_led(true, false);
     if (blue_led_on) { // Altera o estado do LED azul para desligado
@@ -183,13 +221,22 @@ void toggle_green_led() {
 }
 
 void toggle_blue_led() {
+    ssd1306_fill(&ssd, false);
     if (blue_led_on) { // Se o LED azul estiver ligado, desliga
+        printf("Desligando LED azul\n");
+        ssd1306_draw_string(&ssd, "LED azul", 26, 32);
+        ssd1306_draw_string(&ssd, "desligado", 27, 42);
+        ssd1306_send_data(&ssd);
         blue_led_on = false;
         turn_on_led(false, false);
         green_led_on = false;
         return;
     }
     // Se o LED azul estiver desligado, liga
+    printf("Ligando LED azul\n");
+    ssd1306_draw_string(&ssd, "LED azul", 26, 32);
+    ssd1306_draw_string(&ssd, "ligado", 25, 42);
+    ssd1306_send_data(&ssd);
     blue_led_on = true;
     turn_on_led(false, true);
     if (green_led_on) { // Altera o estado do LED verde para desligado

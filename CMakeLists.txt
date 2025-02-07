@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(interfaces_serial interfaces_serial.c )
+add_executable(interfaces_serial interfaces_serial.c inc/ssd1306.c)
 
 pico_generate_pio_header(interfaces_serial ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
 
@@ -50,7 +50,9 @@ pico_enable_stdio_usb(interfaces_serial 1)
 target_link_libraries(interfaces_serial
         pico_stdlib
         hardware_pio
-        hardware_timer)
+        hardware_timer
+        hardware_i2c
+        )
 
 # Add the standard include files to the build
 target_include_directories(interfaces_serial PRIVATE
