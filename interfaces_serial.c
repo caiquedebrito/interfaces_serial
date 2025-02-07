@@ -85,7 +85,7 @@ void toggle_green_led() {
     // Se o LED verde estiver desligado, liga
     green_led_on = true;
     turn_on_led(true, false);
-    if (blue_led_on) {
+    if (blue_led_on) { // Altera o estado do LED azul para desligado
         blue_led_on = false;
     }
 }
@@ -100,7 +100,7 @@ void toggle_blue_led() {
     // Se o LED azul estiver desligado, liga
     blue_led_on = true;
     turn_on_led(false, true);
-    if (green_led_on) {
+    if (green_led_on) { // Altera o estado do LED verde para desligado
         green_led_on = false;
     }
 }
