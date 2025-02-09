@@ -1,6 +1,8 @@
 #  Interfaces de Comunicação Serial com RP2040 UART, SPI e I2C 
 
+## Demonstração e explicação dos resultados
 
+[Vídeo](https://youtube.com/shorts/WW2Ll9_JZnc?feature=share)
 
 ## Objetivos 
 - Compreender o funcionamento e a aplicação de comunicação serial em microcontroladores. 
