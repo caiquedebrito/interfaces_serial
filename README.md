@@ -2,7 +2,7 @@
 
 ## Demonstração e explicação dos resultados
 
-[Vídeo](https://youtube.com/shorts/WW2Ll9_JZnc?feature=share)
+[Vídeo no Youtube](https://youtube.com/shorts/WW2Ll9_JZnc?feature=share)
 
 ## Objetivos 
 - Compreender o funcionamento e a aplicação de comunicação serial em microcontroladores. 
